@@ -1,30 +1,27 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.SceneManagement;
-using UnityEngine.InputSystem;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
     [Header("UI (HUD)")]
-    public TMP_Text scoreText;   // 左上角/右上角都行
+    public TMP_Text scoreText;
     public TMP_Text hpText;
     public TMP_Text skillText;
 
-    [Header("End Panel")]
-    public GameObject endPanel;
-    public TMP_Text resultText;
-    public TMP_Text hintText;
+    [Header("UI Flow")]
+    public UIFlowController ui; // 拖场景里的 UIFlowController 进来（不要放进 GameplayRoot）
 
     [Header("Win Goals")]
-    public int targetScore = 200;     // 分数目标
-    public int normalGoal = 16;       // 普通敌机击杀目标
-    public int eliteGoal = 2;         // 精英击杀目标
+    public int targetScore = 200;
+    public int normalGoal = 16;
+    public int eliteGoal = 2;
 
     [Header("Elite Spawn Rule (Rule A)")]
-    public int eliteEveryNormalKills = 5;  // 每击杀多少普通怪刷1只精英（0=关闭）
-    public EnemySpawnerLimited spawner;    // 你的刷怪器（拖引用）
+    public int eliteEveryNormalKills = 5;
+    public EnemySpawnerLimited spawner;
 
     int _score;
     int _normalKills;
@@ -48,22 +45,7 @@ public class GameManager : MonoBehaviour
         _eliteKills = 0;
         _ended = false;
 
-        Time.timeScale = 1f;
-
-        if (endPanel) endPanel.SetActive(false);
         UpdateHUD();
-    }
-
-    void Update()
-    {
-        if (!_ended) return;
-
-        var kb = Keyboard.current;
-        if (kb != null && kb.rKey.wasPressedThisFrame)
-        {
-            Time.timeScale = 1f;
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-        }
     }
 
     // ====== Score ======
@@ -94,18 +76,10 @@ public class GameManager : MonoBehaviour
         {
             _normalKills++;
 
-            // 规则A：固定节奏刷精英
-            if (eliteEveryNormalKills > 0 &&
-                _normalKills % eliteEveryNormalKills == 0)
+            if (eliteEveryNormalKills > 0 && _normalKills % eliteEveryNormalKills == 0)
             {
-                if (spawner != null)
-                {
-                    spawner.TrySpawnElite();
-                }
-                else
-                {
-                    Debug.LogWarning("GameManager: spawner is null, cannot spawn elite.");
-                }
+                if (spawner != null) spawner.TrySpawnElite();
+                else Debug.LogWarning("GameManager: spawner is null, cannot spawn elite.");
             }
         }
 
@@ -122,39 +96,33 @@ public class GameManager : MonoBehaviour
             _normalKills >= normalGoal &&
             _eliteKills >= eliteGoal;
 
-        if (win) GameOver(true);
+        if (win) GameOver();
     }
 
-    /// <summary>
-    /// win=true 表示胜利；win=false 表示失败
-    /// </summary>
-    public void GameOver(bool win)
+    // 现在只有一个“结束界面”（不区分胜负）
+    public void GameOver()
     {
+        Debug.Log("GameOver() called");
         if (_ended) return;
         _ended = true;
 
-        Time.timeScale = 0f;
+        string title = "GAME OVER";
+        string info = $"Score: {_score}\nNormal Kills: {_normalKills}/{normalGoal}\nElite Kills: {_eliteKills}/{eliteGoal}";
 
-        if (endPanel) endPanel.SetActive(true);
-
-        if (resultText)
-            resultText.text = win ? "YOU WIN!" : "GAME OVER";
-
-        if (hintText)
+        if (ui != null)
         {
-            string detail = win
-                ? $"Score {_score}/{targetScore} | Normal {_normalKills}/{normalGoal} | Elite {_eliteKills}/{eliteGoal}"
-                : "Try again!";
-
-            hintText.text = (win ? GetEncourageText() : "Try again!") +
-                            "\n" + detail +
-                            "\nPress R to Restart";
+            ui.ShowGameOver(title, info);
+        }
+        else
+        {
+            Debug.LogWarning("GameManager: ui (UIFlowController) is null. Falling back to pause only.");
+            Time.timeScale = 0f;
         }
 
-        Debug.Log($"GameOver called. win={win} score={_score} normalKills={_normalKills} eliteKills={_eliteKills}");
+        Debug.Log($"GameOver called. score={_score} normalKills={_normalKills} eliteKills={_eliteKills}");
     }
 
-    // ====== 可选：给HUD用（如果你想从GM直接刷新HP/Skill文本） ======
+    // ====== 可选：给HUD用 ======
     public void SetHPText(string s)
     {
         if (hpText) hpText.text = s;
@@ -168,21 +136,12 @@ public class GameManager : MonoBehaviour
     void UpdateHUD()
     {
         if (scoreText)
-        {
-            // 显示更完整：分数+击杀进度
             scoreText.text = $"Score: {_score}  N:{_normalKills}/{normalGoal}  E:{_eliteKills}/{eliteGoal}";
-        }
     }
 
-    string GetEncourageText()
+    // 如果你其他地方仍旧在调用 GameOver(true/false)，保留一个兼容入口（可删）
+    public void GameOver(bool win)
     {
-        string[] tips =
-        {
-            "Great job, pilot!",
-            "Nice shooting!",
-            "Well done!",
-            "You cleared the mission!"
-        };
-        return tips[Random.Range(0, tips.Length)];
+        GameOver();
     }
 }
