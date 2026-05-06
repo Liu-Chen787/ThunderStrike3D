@@ -571,6 +571,7 @@ MonoBehaviour:
   lightningPrefab: {fileID: 5225455176718880169, guid: 59fd80584945fc7448940995b97dab30, type: 3}
   dropChance: 1
   heartWeight: 0.5
+  dropZ: 0
 --- !u!1 &3368213822277995520
 GameObject:
   m_ObjectHideFlags: 0
@@ -716,9 +717,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7052358971073750410}
-  - component: {fileID: 7668442928572067151}
   - component: {fileID: 8616047716628910851}
   - component: {fileID: 5013768742633419908}
+  - component: {fileID: 3571717175308718405}
   m_Layer: 0
   m_Name: EnemyPro
   m_TagString: Untagged
@@ -745,24 +746,6 @@ Transform:
   - {fileID: 3919130753580801161}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7668442928572067151
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6856288193131436260}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2720603e4f98c4d42af471c8c436ad82, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyMover
-  minX: -13
-  maxX: 13
-  minY: -8
-  maxY: 2
-  zPlane: 8
-  speed: 6
 --- !u!114 &8616047716628910851
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -790,6 +773,29 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HitImpactVFX
   hitVfxPrefab: {fileID: 8509259468548637431, guid: 093c256d2477bf544b339f82ad10361d, type: 3}
+--- !u!114 &3571717175308718405
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6856288193131436260}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3bfd791df92844489d3c60570b4611c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
+  detectRange: 12
+  attackRange: 6
+  loseRange: 12
+  patrolSpeed: 3.5
+  chaseSpeed: 7
+  zPlane: 8
+  minX: -13
+  maxX: 13
+  minY: -15
+  maxY: 2
+  attackFireMultiplier: 0.2
 --- !u!1 &8811355426336189422
 GameObject:
   m_ObjectHideFlags: 0

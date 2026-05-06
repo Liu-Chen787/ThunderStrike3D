@@ -10,9 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 5279395281407091755}
   - component: {fileID: 1550507132165356614}
-  - component: {fileID: -8499048416763521500}
   - component: {fileID: 121856389843350140}
   - component: {fileID: -5703665515609118634}
+  - component: {fileID: -6408789787924879520}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Untagged
@@ -59,24 +59,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &-8499048416763521500
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2154773520485952374}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2720603e4f98c4d42af471c8c436ad82, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyMover
-  minX: -13
-  maxX: 13
-  minY: -13
-  maxY: 2
-  zPlane: 8
-  speed: 1
 --- !u!114 &121856389843350140
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -104,6 +86,29 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HitImpactVFX
   hitVfxPrefab: {fileID: 8509259468548637431, guid: 093c256d2477bf544b339f82ad10361d, type: 3}
+--- !u!114 &-6408789787924879520
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2154773520485952374}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3bfd791df92844489d3c60570b4611c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
+  detectRange: 8
+  attackRange: 4
+  loseRange: 12
+  patrolSpeed: 3.5
+  chaseSpeed: 5.5
+  zPlane: 8
+  minX: -13
+  maxX: 13
+  minY: -15
+  maxY: 2
+  attackFireMultiplier: 0.4
 --- !u!1 &3315975615435382722
 GameObject:
   m_ObjectHideFlags: 0

@@ -5,80 +5,99 @@ using TMPro;
 public class UIFlowController : MonoBehaviour
 {
     [Header("Panels")]
-    public GameObject startPanel;   // Canvas/StartPanel
-    public GameObject endPanel;     // Canvas/EndPanel
+    public GameObject startPanel;
+    public GameObject endPanel;
 
-    [Header("Optional HUD Roots")]
-    public GameObject hudRoot;      // Canvas/HUD
-    public GameObject itemBarRoot;  // Canvas/ItemBar
+    [Header("HUD Roots")]
+    public GameObject hudRoot;
+    public GameObject itemBarRoot;
 
     [Header("Gameplay Root")]
-    public GameObject gameplayRoot; // GameplayRoot（玩家/刷怪/敌人/星空等）
+    public GameObject gameplayRoot;
 
-    [Header("End Panel Text (Optional)")]
-    public TMP_Text titleText;      // 例如：GAME OVER
-    public TMP_Text infoText;       // 例如：Score: xxx / hint
+    [Header("End Panel Text")]
+    public TMP_Text titleText;
+    public TMP_Text infoText;
 
-    bool _gameStarted;
+    [Header("Next Level")]
+    public GameObject nextLevelButton;
+    [SerializeField] private string nextLevelSceneName = "Level2";
+
+    [Header("Boss HUD")]
+    public GameObject bossHUD;   // ← 声明在这里，Inspector 里拖入 BossHUD 对象
+
     bool _gameEnded;
 
     void Start()
     {
-        _gameStarted = false;
         _gameEnded = false;
 
-        // 初始：显示开始界面，隐藏结束界面，暂停玩法
-        if (startPanel) startPanel.SetActive(true);
-        if (endPanel) endPanel.SetActive(false);
+        if (startPanel)      startPanel.SetActive(true);
+        if (endPanel)        endPanel.SetActive(false);
+        if (nextLevelButton) nextLevelButton.SetActive(false);
+        if (bossHUD)         bossHUD.SetActive(false);  // 默认隐藏
 
         SetGameplayActive(false);
         SetHudActive(false);
-
         Time.timeScale = 0f;
     }
 
     public void StartGame()
-{
-    Debug.Log("StartGame()");
+    {
+        if (startPanel) startPanel.SetActive(false);
+        SetGameplayActive(true);
+        SetHudActive(true);
+        if (bossHUD) bossHUD.SetActive(true);  // 游戏开始时显示 Boss 血条
+        Time.timeScale = 1f;
+    }
 
-    if (startPanel) startPanel.SetActive(false);
-    if (endPanel) endPanel.SetActive(false);
-
-    if (gameplayRoot) gameplayRoot.SetActive(true);
-
-    if (hudRoot) hudRoot.SetActive(true);
-    if (itemBarRoot) itemBarRoot.SetActive(true);
-
-    Time.timeScale = 1f;
-}
-
-    // GameManager 在“游戏结束”时调用这个（不区分胜负）
+    // ── 死亡时调用：隐藏 Next Level ─────────────────
     public void ShowGameOver(string title = "GAME OVER", string info = "")
     {
         if (_gameEnded) return;
         _gameEnded = true;
 
-        if (startPanel) startPanel.SetActive(false);
         if (endPanel) endPanel.SetActive(true);
-
-        // HUD 可选隐藏（更干净）
+        if (bossHUD)  bossHUD.SetActive(false);
         SetHudActive(false);
-
-        // 游戏暂停（但UI仍可点击）
         Time.timeScale = 0f;
 
         if (titleText) titleText.text = title;
-        if (infoText) infoText.text = info;
+        if (infoText)  infoText.text  = info;
+
+        if (nextLevelButton) nextLevelButton.SetActive(false);
     }
 
-    // Restart按钮绑定这个
+    // ── 胜利时调用：显示 Next Level ─────────────────
+    public void ShowVictory(string title = "MISSION COMPLETE", string info = "")
+    {
+        if (_gameEnded) return;
+        _gameEnded = true;
+
+        if (endPanel) endPanel.SetActive(true);
+        if (bossHUD)  bossHUD.SetActive(false);
+        SetHudActive(false);
+        Time.timeScale = 0f;
+
+        if (titleText) titleText.text = title;
+        if (infoText)  infoText.text  = info;
+
+        if (nextLevelButton) nextLevelButton.SetActive(true);
+    }
+
+    // ── 按钮绑定 ─────────────────────────────────────
+    public void OnNextLevelClicked()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(nextLevelSceneName);
+    }
+
     public void Restart()
     {
         Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
-    // Exit按钮绑定这个
     public void Exit()
     {
 #if UNITY_EDITOR
@@ -95,7 +114,7 @@ public class UIFlowController : MonoBehaviour
 
     void SetHudActive(bool on)
     {
-        if (hudRoot) hudRoot.SetActive(on);
+        if (hudRoot)     hudRoot.SetActive(on);
         if (itemBarRoot) itemBarRoot.SetActive(on);
     }
 }

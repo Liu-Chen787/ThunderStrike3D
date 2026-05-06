@@ -88,40 +88,39 @@ public class GameManager : MonoBehaviour
     }
 
     void CheckWin()
+{
+    if (_ended) return;
+
+    bool win =
+        _score >= targetScore &&
+        _normalKills >= normalGoal &&
+        _eliteKills >= eliteGoal;
+
+    if (win)
     {
-        if (_ended) return;
-
-        bool win =
-            _score >= targetScore &&
-            _normalKills >= normalGoal &&
-            _eliteKills >= eliteGoal;
-
-        if (win) GameOver();
-    }
-
-    // 现在只有一个“结束界面”（不区分胜负）
-    public void GameOver()
-    {
-        Debug.Log("GameOver() called");
-        if (_ended) return;
         _ended = true;
-
-        string title = "GAME OVER";
-        string info = $"Score: {_score}\nNormal Kills: {_normalKills}/{normalGoal}\nElite Kills: {_eliteKills}/{eliteGoal}";
+        string info = $"Score: {_score}\nNormal: {_normalKills}  Elite: {_eliteKills}";
 
         if (ui != null)
-        {
-            ui.ShowGameOver(title, info);
-        }
+            ui.ShowVictory("MISSION COMPLETE", info); // ← 改这里
         else
-        {
-            Debug.LogWarning("GameManager: ui (UIFlowController) is null. Falling back to pause only.");
             Time.timeScale = 0f;
-        }
-
-        Debug.Log($"GameOver called. score={_score} normalKills={_normalKills} eliteKills={_eliteKills}");
     }
+}
 
+// 死亡仍然调 ShowGameOver（不变）
+public void GameOver()
+{
+    if (_ended) return;
+    _ended = true;
+
+    string info = $"Score: {_score}\nNormal: {_normalKills}/{normalGoal}  Elite: {_eliteKills}/{eliteGoal}";
+
+    if (ui != null)
+        ui.ShowGameOver("GAME OVER", info);
+    else
+        Time.timeScale = 0f;
+}
     // ====== 可选：给HUD用 ======
     public void SetHPText(string s)
     {
@@ -138,6 +137,18 @@ public class GameManager : MonoBehaviour
         if (scoreText)
             scoreText.text = $"Score: {_score}  N:{_normalKills}/{normalGoal}  E:{_eliteKills}/{eliteGoal}";
     }
+    // Boss 专用胜利入口（Level 2 使用）
+    public void ShowVictoryFromBoss()
+{
+    if (_ended) return;
+    _ended = true;
+
+    string info = $"Command Carrier destroyed!\nScore: {_score}";
+    if (ui != null)
+        ui.ShowVictory("MISSION COMPLETE", info);
+    else
+        Time.timeScale = 0f;
+}
 
     // 如果你其他地方仍旧在调用 GameOver(true/false)，保留一个兼容入口（可删）
     public void GameOver(bool win)

@@ -4,10 +4,13 @@ public class EnemyBulletMove : MonoBehaviour
 {
     [Header("Move")]
     public float speed = 18f;
-    public int directionSign = -1; // -1 = 往世界 -Z；+1 = 往世界 +Z（不对就改这个）
+    public int directionSign = -1;
+
+    [Header("Damage")]
+    public int damage = 1;  // Inspector 直接修改
 
     [Header("Auto Destroy")]
-    public float maxLifeTime = 6f; // 保险上限
+    public float maxLifeTime = 6f;
 
     float _life;
 
@@ -15,19 +18,17 @@ public class EnemyBulletMove : MonoBehaviour
     {
         _life = 0f;
 
-        // 强制关闭重力（很多“掉落”就是这里）
         var rb = GetComponent<Rigidbody>();
         if (rb)
         {
             rb.useGravity = false;
-            rb.linearVelocity = Vector3.zero; // Unity6 用 linearVelocity
+            rb.linearVelocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
         }
     }
 
     void Update()
     {
-        // 沿自身Z轴飞：transform.forward
         transform.position += transform.forward * (speed * directionSign) * Time.deltaTime;
 
         _life += Time.deltaTime;
@@ -38,8 +39,7 @@ public class EnemyBulletMove : MonoBehaviour
     {
         if (!other.CompareTag("Player")) return;
 
-        other.GetComponent<PlayerHealth>()?.TakeDamage(1);
+        other.GetComponent<PlayerHealth>()?.TakeDamage(damage);
         Destroy(gameObject);
     }
-
 }
